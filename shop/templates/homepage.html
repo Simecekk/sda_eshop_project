@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>LevneTelefony.cz</h1>
+<br>
+
+<h4>Products count: {{ products.count }}</h4>
+
+{% for product in products %}
+    <br>
+    <hr>
+    Title: {{ product.title }}<br>
+    Price: {{ product.price }}<br>
+    Released At: {{ product.released_at }}
+{% endfor %}
+
+</body>
+</html>

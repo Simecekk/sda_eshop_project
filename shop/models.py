@@ -14,8 +14,9 @@ class Product(models.Model):
 
     title = models.CharField(max_length=256)
     price = models.DecimalField(decimal_places=10, max_digits=20)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=256)
+    release_date = models.DateField()
 
     def __str__(self):
         return f"{self.title} : {self.id}"
