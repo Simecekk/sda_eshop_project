@@ -10,7 +10,10 @@ def hello_world_view(request):
 
 def homepage_view(request):
     products = Product.objects.all()
+
     context = {
-        "products": products
+        "products": products,
+        "page_title": "LevneTelefony.cz"
     }
+
     return TemplateResponse(request, "homepage.html", context=context)
