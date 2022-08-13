@@ -19,6 +19,6 @@ from shop.views import hello_world_view, homepage_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("hello/", hello_world_view),
-    path("", homepage_view)
+    path("hello/", hello_world_view, name="hello_world"),
+    path("", homepage_view, name="homepage")
 ]

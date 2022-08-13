@@ -12,26 +12,27 @@
 <body>
 
 <div class="container">
-<h1 class="mx-auto">LevneTelefony.cz</h1>
+<h1 class="display-4">LevneTelefony.cz</h1>
 <br>
 
 <div class="container">
     <div class="row">
         {% for product in products %}
-            <div class="card mx-auto" style="width: 18rem;">
+            <div class="card mx-auto mt-5" style="width: 18rem;">
                 <img src="https://via.placeholder.com/150" class="bd-placeholder-img card-img-top" alt="">
                 <div class="card-body">
                     <h5 class="card-title">{{ product.title }}</h5>
-                    <p class="card-text"><strong>Price:</strong> {{ product.price }}</p>
-                    <p class="card-text"><strong>Released at:</strong> {{ product.release_date }}</p>
-                    <p class="card-text">{{ product.description }}</p>
+                    <p class="card-text"><strong>Price:</strong> {{ product.price|floatformat:2 }}</p>
+                    <p class="card-text"><strong>Released at:</strong> {{ product.release_date|date:"d.m. Y" }}</p>
+                    <p class="card-text">{{ product.description}}</p>
                     <a href="#" class="btn btn-primary">Add to cart</a>
                 </div>
             </div>
         {% endfor %}
-
     </div>
 </div>
+
+<p class="mt-5">count: {{ products.count }}</p>
 </div>
 
 </body>

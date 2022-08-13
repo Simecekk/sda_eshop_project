@@ -9,7 +9,12 @@ def hello_world_view(request):
 
 
 def homepage_view(request):
-    products = Product.objects.all()
+    category = request.GET.get("category")
+
+    if category:
+        products = Product.objects.filter(category=category)
+    else:
+        products = Product.objects.all()
 
     context = {
         "products": products,
