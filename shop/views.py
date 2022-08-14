@@ -3,6 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from shop.models import Product, Cart
 from django.contrib.auth import get_user_model
+from django.views import View
 
 
 def hello_world_view(request):
@@ -10,23 +11,44 @@ def hello_world_view(request):
     return HttpResponse(f"Hello world {name}")
 
 
-def homepage_view(request):
-    category = request.GET.get("category")
+# def homepage_view(request):
+#     category = request.GET.get("category")
+#
+#     if category:
+#         products = Product.objects.filter(category=category)
+#     else:
+#         products = Product.objects.all()
+#
+#     user = get_user_model().objects.first()
+#     cart, created = Cart.objects.get_or_create(user=user)
+#
+#     context = {
+#         "products": products,
+#         "cart": cart
+#     }
+#
+#     return TemplateResponse(request, "homepage.html", context=context)
 
-    if category:
-        products = Product.objects.filter(category=category)
-    else:
-        products = Product.objects.all()
 
-    user = get_user_model().objects.first()
-    cart, created = Cart.objects.get_or_create(user=user)
+class HomepageView(View):
 
-    context = {
-        "products": products,
-        "cart": cart
-    }
+    def get(self, request):
+        category = request.GET.get("category")
 
-    return TemplateResponse(request, "homepage.html", context=context)
+        if category:
+            products = Product.objects.filter(category=category)
+        else:
+            products = Product.objects.all()
+
+        user = get_user_model().objects.first()
+        cart, created = Cart.objects.get_or_create(user=user)
+
+        context = {
+            "products": products,
+            "cart": cart
+        }
+
+        return TemplateResponse(request, "homepage.html", context=context)
 
 
 def add_to_cart_view(request, item_pk):
