@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Cart - {{ cart.user.username }}</h1>
+
+{% for product in cart.products.all %}
+    Title: {{ product.title }}<br>
+    price: {{ product.price }}<br><br>
+{% endfor %}
+
+<br>
+
+Total Price = {{ cart.total_price }} ,- CZK
+</body>
+</html>

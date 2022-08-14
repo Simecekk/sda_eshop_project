@@ -1,6 +1,8 @@
 from django.http import HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
-from shop.models import Product
+from shop.models import Product, Cart
+from django.contrib.auth import get_user_model
 
 
 def hello_world_view(request):
@@ -16,9 +18,29 @@ def homepage_view(request):
     else:
         products = Product.objects.all()
 
+    user = get_user_model().objects.first()
+    cart, created = Cart.objects.get_or_create(user=user)
+
     context = {
         "products": products,
-        "page_title": "LevneTelefony.cz"
+        "page_title": "LevneTelefony.cz",
+        "cart": cart
     }
 
     return TemplateResponse(request, "homepage.html", context=context)
+
+
+def add_to_cart_view(request, item_pk):
+    product = get_object_or_404(Product, pk=item_pk)
+    user = get_user_model().objects.first()
+    cart, created = Cart.objects.get_or_create(user=user)
+    cart.products.add(product)
+    return redirect(request.META.get('HTTP_REFERER', 'homepage'))
+
+
+def cart_view(request, pk):
+    cart = get_object_or_404(Cart, pk=pk)
+    context = {
+        "cart": cart
+    }
+    return TemplateResponse(request, "cart.html", context=context)

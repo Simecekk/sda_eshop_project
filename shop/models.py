@@ -1,4 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+from decimal import Decimal
 
 
 class Product(models.Model):
@@ -20,3 +22,21 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.title} : {self.id}"
+
+
+class Cart(models.Model):
+    products = models.ManyToManyField(
+        Product, related_name="carts",
+    )
+    user = models.OneToOneField(
+        get_user_model(),
+        related_name="cart",
+        on_delete=models.CASCADE
+    )
+
+    @property
+    def total_price(self):
+        total_price = Decimal("0")
+        for product in self.products.all():
+            total_price += product.price
+        return total_price
