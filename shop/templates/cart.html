@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>Cart - {{ cart.user.username }}</h1>
+{% extends "base.html" %}
 
-{% for product in cart.products.all %}
-    Title: {{ product.title }}<br>
-    price: {{ product.price }}<br><br>
-{% endfor %}
+{% block content %}
 
-<br>
+    <h1>Cart - {{ cart.user.username }}</h1><br>
+    <strong>Total Price</strong> = {{ cart.total_price|floatformat:2 }} ,- CZK
 
-Total Price = {{ cart.total_price }} ,- CZK
-</body>
-</html>
+    {% for product in cart.products.all %}
+        <div class="card mt-5" style="width: 18rem;">
+            <img src="https://via.placeholder.com/150" class="bd-placeholder-img card-img-top" alt="">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.title }}</h5>
+                <p class="card-text"><strong>Price:</strong> {{ product.price|floatformat:2 }} ,- CZK</p>
+                <p class="card-text">{{ product.description }}</p>
+                <a href="{% url "remove_from_cart" product.pk %}" class="btn btn-danger">Remove from cart</a>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock content %}

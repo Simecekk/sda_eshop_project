@@ -23,7 +23,6 @@ def homepage_view(request):
 
     context = {
         "products": products,
-        "page_title": "LevneTelefony.cz",
         "cart": cart
     }
 
@@ -35,6 +34,14 @@ def add_to_cart_view(request, item_pk):
     user = get_user_model().objects.first()
     cart, created = Cart.objects.get_or_create(user=user)
     cart.products.add(product)
+    return redirect(request.META.get('HTTP_REFERER', 'homepage'))
+
+
+def remove_from_cart_view(request, item_pk):
+    product = get_object_or_404(Product, pk=item_pk)
+    user = get_user_model().objects.first()
+    cart, created = Cart.objects.get_or_create(user=user)
+    cart.products.remove(product)
     return redirect(request.META.get('HTTP_REFERER', 'homepage'))
 
 
