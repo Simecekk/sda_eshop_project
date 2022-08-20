@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{ form.as_p }}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ product.title }}</h1>
+
+    {% for review in product.reviews.all %}
+        <p>Reviewer: {{ review.user.username }}</p>
+        <p>Score: {{ review.score }}</p>
+        <p>Text: {{ review.text }}</p><br><br>
+    {% endfor %}
+
+    <br><br>
+
+    <form action="{% url "list_product_review" form.initial.product.pk %}" method="post">
+        {% csrf_token %}
+        {{ form.score.html_name }}
+        {{ form.score }}<br><br>
+        {{ form.text.html_name }}
+        {{ form.text }}<br>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+{% endblock content %}
