@@ -3,7 +3,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from shop.models import Product, Cart
 from django.contrib.auth import get_user_model
-from django.views import View
+from django.views.generic import TemplateView
+from shop.forms import ProductReviewForm
 
 
 def hello_world_view(request):
@@ -30,10 +31,13 @@ def hello_world_view(request):
 #     return TemplateResponse(request, "homepage.html", context=context)
 
 
-class HomepageView(View):
+class HomepageView(TemplateView):
+    template_name = "homepage.html"
 
-    def get(self, request):
-        category = request.GET.get("category")
+    def get_context_data(self, **kwargs):
+        context = super(HomepageView, self).get_context_data(**kwargs)
+
+        category = self.request.GET.get("category")
 
         if category:
             products = Product.objects.filter(category=category)
@@ -43,12 +47,12 @@ class HomepageView(View):
         user = get_user_model().objects.first()
         cart, created = Cart.objects.get_or_create(user=user)
 
-        context = {
+        context.update({
             "products": products,
             "cart": cart
-        }
+        })
 
-        return TemplateResponse(request, "homepage.html", context=context)
+        return context
 
 
 def add_to_cart_view(request, item_pk):
@@ -73,3 +77,19 @@ def cart_view(request, pk):
         "cart": cart
     }
     return TemplateResponse(request, "cart.html", context=context)
+
+
+class ListProductReviewView(TemplateView):
+    template_name = "product_reviews.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ListProductReviewView, self).get_context_data(**kwargs)
+
+        product = get_object_or_404(Product, pk=kwargs["product_pk"])
+        user = get_user_model().objects.first()
+
+        context.update({
+            "form": ProductReviewForm(),
+            "product": product
+        })
+        return context

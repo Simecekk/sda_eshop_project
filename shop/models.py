@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from decimal import Decimal
 
@@ -40,3 +41,18 @@ class Cart(models.Model):
         for product in self.products.all():
             total_price += product.price
         return total_price
+
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(
+        Product, related_name="reviews",
+        on_delete=models.CASCADE
+    )
+    score = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
+    )
+    user = models.ForeignKey(
+        get_user_model(), related_name="user_reviews",
+        on_delete=models.CASCADE
+    )
+    text = models.TextField()
