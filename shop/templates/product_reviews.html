@@ -7,16 +7,20 @@
         <p>Reviewer: {{ review.user.username }}</p>
         <p>Score: {{ review.score }}</p>
         <p>Text: {{ review.text }}</p><br><br>
+        <a href="{% url "delete_product_review" review.pk %}" class="btn btn-danger">Delete</a>
+        <hr>
     {% endfor %}
 
     <br><br>
 
-    <form action="{% url "list_product_review" form.initial.product.pk %}" method="post">
+    <form action="{% url "list_product_review" product.pk %}" method="post">
         {% csrf_token %}
-        {{ form.score.html_name }}
-        {{ form.score }}<br><br>
-        {{ form.text.html_name }}
-        {{ form.text }}<br>
+        {{ form.score.html_name }}:
+        {{ form.score }}
+        {{ form.score.errors }}<br><br>
+        {{ form.text.html_name }}:
+        {{ form.text }}
+        {{ form.text.errors }}<br>
         <input type="submit" value="Submit" class="btn btn-primary">
     </form>
 {% endblock content %}

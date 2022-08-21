@@ -1,4 +1,5 @@
 from django.http import HttpResponse, JsonResponse
+from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from shop.models import Product, Cart, ProductReview
@@ -7,8 +8,7 @@ from django.views.generic import TemplateView, FormView
 from shop.forms import ProductReviewForm
 
 
-def hello_world_view(request):
-    name = request.GET.get("name")
+def hello_world_view(request, name):
     return HttpResponse(f"Hello world {name}")
 
 
@@ -79,6 +79,14 @@ def cart_view(request, pk):
     return TemplateResponse(request, "cart.html", context=context)
 
 
+class DeleteProductReviewView(View):
+
+    def get(self, request, pk, *args, **kwargs):
+        product_review = get_object_or_404(ProductReview, pk=pk)
+        product_review.delete()
+        return redirect(request.META.get('HTTP_REFERER', 'homepage'))
+
+
 class ListProductReviewView(FormView):
     template_name = "product_reviews.html"
     form_class = ProductReviewForm
@@ -114,7 +122,9 @@ class ListProductReviewView(FormView):
 
         bounded_form = ProductReviewForm(data=form_data)
         if not bounded_form.is_valid():
-            return JsonResponse(status=400, data={"message": "invalid_data"})
+            context = self.get_context_data()
+            context["form"] = bounded_form
+            return TemplateResponse(request, template=self.template_name, context=context)
 
         ProductReview.objects.create(
             user=bounded_form.cleaned_data["user"],
