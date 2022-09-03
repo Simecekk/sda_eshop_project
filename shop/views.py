@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -136,14 +137,13 @@ class DeleteProductReviewView(View):
         return redirect(request.META.get('HTTP_REFERER', 'homepage'))
 
 
-class ListProductReviewView(FormView):
+class ListProductReviewView(LoginRequiredMixin, FormView):
     template_name = "product_reviews.html"
     form_class = ProductReviewForm
 
     def get_initial(self):
         product = self.get_object()
-        user = get_user_model().objects.first()
-        return {"product": product,  "user": user}
+        return {"product": product,  "user": self.request.user}
 
     def get_object(self):
         return get_object_or_404(Product, pk=self.kwargs["product_pk"])
@@ -151,7 +151,7 @@ class ListProductReviewView(FormView):
     def get_context_data(self, **kwargs):
         context = super(ListProductReviewView, self).get_context_data(**kwargs)
         product = self.get_object()
-        user = get_user_model().objects.first()
+        user = self.request.user
         context.update({
             "product": product,
             "cart": user.cart
@@ -160,7 +160,7 @@ class ListProductReviewView(FormView):
 
     def post(self, request, *args, **kwargs):
         product = self.get_object()
-        user = get_user_model().objects.first()
+        user = self.request.user
 
         form_data = {
             "user": user.pk,
@@ -193,9 +193,14 @@ class HelpdeskContactView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(HelpdeskContactView, self).get_context_data(**kwargs)
-        user = get_user_model().objects.first()
+
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+        else:
+            cart = None
+
         context.update({
-            "cart": user.cart
+            "cart": cart
         })
         return context
 
@@ -210,8 +215,13 @@ class ProductReviewUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductReviewUpdateView, self).get_context_data(**kwargs)
-        user = get_user_model().objects.first()
+
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+        else:
+            cart = None
+
         context.update({
-            "cart": user.cart
+            "cart": cart
         })
         return context
