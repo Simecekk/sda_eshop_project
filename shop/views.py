@@ -5,18 +5,28 @@ from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
+from django.views.generic.edit import FormMixin
+
 from shop.models import Product, Cart, ProductReview, HelpdeskContact
-from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
 from django.contrib.auth.forms import AuthenticationForm
-from shop.forms import ProductReviewForm, HelpdeskContactForm, ProductReviewUpdateForm
+from shop.forms import ProductReviewForm, HelpdeskContactForm, ProductReviewUpdateForm, RegistrationForm
 
 
 def hello_world_view(request, name):
     return HttpResponse(f"Hello world {name}")
 
 
-class LoginView(FormView, TemplateView):
+class LogoutView(View):
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        messages.success(request, "Logout successful")
+        return redirect("homepage")
+
+
+class LoginView(FormMixin, TemplateView):
     template_name = "login.html"
     form_class = AuthenticationForm
 
@@ -32,6 +42,21 @@ class LoginView(FormView, TemplateView):
 
         messages.error(request, "Wrong credentials")
         return redirect("login")
+
+
+class RegistrationView(FormMixin, TemplateView):
+    template_name = "registration.html"
+    form_class = RegistrationForm
+
+    def post(self, request, *args, **kwargs):
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account was created!")
+            return redirect("login")
+        messages.error(request, "Something wrong")
+        return TemplateResponse(request, "registration.html", context={"form": form})
+
 
 # def homepage_view(request):
 #     category = request.GET.get("category")

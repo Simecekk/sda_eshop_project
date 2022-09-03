@@ -18,7 +18,7 @@ from django.urls import path
 from shop.views import hello_world_view, add_to_cart_view,\
     cart_view, remove_from_cart_view, HomepageView, ListProductReviewView,\
     DeleteProductReviewView, HelpdeskContactView, ProductReviewUpdateView, \
-    LoginView
+    LoginView, LogoutView, RegistrationView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +32,6 @@ urlpatterns = [
     path("add/contact/", HelpdeskContactView.as_view(), name="helpdesk_contact"),
     path("update/product_review/<int:pk>/", ProductReviewUpdateView.as_view(), name="update_product_review"),
     path("login/", LoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("register/", RegistrationView.as_view(), name="register"),
 ]

@@ -45,5 +45,11 @@
 
 <a href="{% url "helpdesk_contact" %}">contact us</a> <br><br>
 
+{% if request.user.is_authenticated %}
+    <a href="{% url "logout" %}">Log Out</a>
+{% else %}
+    <a href="{% url "register" %}">register here</a>
+{% endif %}
+
 </body>
 </html>
