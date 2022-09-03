@@ -1,17 +1,37 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from shop.models import Product, Cart, ProductReview, HelpdeskContact
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView
+from django.contrib.auth.forms import AuthenticationForm
 from shop.forms import ProductReviewForm, HelpdeskContactForm, ProductReviewUpdateForm
 
 
 def hello_world_view(request, name):
     return HttpResponse(f"Hello world {name}")
 
+
+class LoginView(FormView, TemplateView):
+    template_name = "login.html"
+    form_class = AuthenticationForm
+
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            messages.success(request, "Log in successfully")
+            return redirect("homepage")
+
+        messages.error(request, "Wrong credentials")
+        return redirect("login")
 
 # def homepage_view(request):
 #     category = request.GET.get("category")
@@ -45,8 +65,10 @@ class HomepageView(TemplateView):
         else:
             products = Product.objects.all()
 
-        user = get_user_model().objects.first()
-        cart, created = Cart.objects.get_or_create(user=user)
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+        else:
+            cart = None
 
         context.update({
             "products": products,
@@ -56,24 +78,25 @@ class HomepageView(TemplateView):
         return context
 
 
+@login_required
 def add_to_cart_view(request, item_pk):
     product = get_object_or_404(Product, pk=item_pk)
-    user = get_user_model().objects.first()
-    cart, created = Cart.objects.get_or_create(user=user)
+    cart, created = Cart.objects.get_or_create(user=request.user)
     cart.products.add(product)
     return redirect(request.META.get('HTTP_REFERER', 'homepage'))
 
 
+@login_required
 def remove_from_cart_view(request, item_pk):
     product = get_object_or_404(Product, pk=item_pk)
-    user = get_user_model().objects.first()
-    cart, created = Cart.objects.get_or_create(user=user)
+    cart, created = Cart.objects.get_or_create(user=request.user)
     cart.products.remove(product)
     return redirect(request.META.get('HTTP_REFERER', 'homepage'))
 
 
+@login_required
 def cart_view(request, pk):
-    cart = get_object_or_404(Cart, pk=pk)
+    cart = get_object_or_404(Cart, pk=pk, user=request.user)
     context = {
         "cart": cart
     }

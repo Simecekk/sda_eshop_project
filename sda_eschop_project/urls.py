@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from shop.views import hello_world_view, add_to_cart_view,\
     cart_view, remove_from_cart_view, HomepageView, ListProductReviewView,\
-    DeleteProductReviewView, HelpdeskContactView, ProductReviewUpdateView
+    DeleteProductReviewView, HelpdeskContactView, ProductReviewUpdateView, \
+    LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +30,6 @@ urlpatterns = [
     path("product_review/<int:product_pk>/", ListProductReviewView.as_view(), name="list_product_review"),
     path("delete/product_review/<int:pk>/", DeleteProductReviewView.as_view(), name="delete_product_review"),
     path("add/contact/", HelpdeskContactView.as_view(), name="helpdesk_contact"),
-    path("update/product_review/<int:pk>/", ProductReviewUpdateView.as_view(), name="update_product_review")
+    path("update/product_review/<int:pk>/", ProductReviewUpdateView.as_view(), name="update_product_review"),
+    path("login/", LoginView.as_view(), name="login"),
 ]
