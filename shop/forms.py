@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from shop.models import Product
+from shop.models import Product, HelpdeskContact, ProductReview
 
 
 def error_in_text_validator(value):
@@ -19,3 +19,16 @@ class ProductReviewForm(forms.Form):
     def clean_text(self):
         value = self.data["text"].replace("sprosty", "******")
         return value
+
+
+class ProductReviewUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ProductReview
+        fields = ("score", "text")
+
+
+class HelpdeskContactForm(forms.ModelForm):
+    class Meta:
+        model = HelpdeskContact
+        fields = ("email", "title", "text")
+        # exclude = ("solved", )

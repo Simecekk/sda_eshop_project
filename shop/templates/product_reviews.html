@@ -8,6 +8,7 @@
         <p>Score: {{ review.score }}</p>
         <p>Text: {{ review.text }}</p><br><br>
         <a href="{% url "delete_product_review" review.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url "update_product_review" review.pk %}" class="btn btn-success">Update</a>
         <hr>
     {% endfor %}
 

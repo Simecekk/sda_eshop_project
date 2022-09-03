@@ -1,11 +1,12 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
-from shop.models import Product, Cart, ProductReview
+from shop.models import Product, Cart, ProductReview, HelpdeskContact
 from django.contrib.auth import get_user_model
-from django.views.generic import TemplateView, FormView
-from shop.forms import ProductReviewForm
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView
+from shop.forms import ProductReviewForm, HelpdeskContactForm, ProductReviewUpdateForm
 
 
 def hello_world_view(request, name):
@@ -134,3 +135,35 @@ class ListProductReviewView(FormView):
         )
 
         return self.get(request, *args, **kwargs)
+
+
+class HelpdeskContactView(CreateView):
+    template_name = "contact.html"
+    form_class = HelpdeskContactForm
+    model = HelpdeskContact
+    success_url = reverse_lazy("homepage")
+
+    def get_context_data(self, **kwargs):
+        context = super(HelpdeskContactView, self).get_context_data(**kwargs)
+        user = get_user_model().objects.first()
+        context.update({
+            "cart": user.cart
+        })
+        return context
+
+
+class ProductReviewUpdateView(UpdateView):
+    template_name = "update_product_review.html"
+    form_class = ProductReviewUpdateForm
+    model = ProductReview
+
+    def get_success_url(self):
+        return reverse("list_product_review", args=[self.object.product.id, ])
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductReviewUpdateView, self).get_context_data(**kwargs)
+        user = get_user_model().objects.first()
+        context.update({
+            "cart": user.cart
+        })
+        return context

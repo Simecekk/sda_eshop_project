@@ -56,3 +56,11 @@ class ProductReview(models.Model):
         on_delete=models.CASCADE
     )
     text = models.TextField()
+
+
+class HelpdeskContact(models.Model):
+    email = models.EmailField()
+    title = models.CharField(max_length=512)
+    text = models.TextField()
+    solved = models.BooleanField(default=False)
+
