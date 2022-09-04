@@ -35,6 +35,11 @@ class Cart(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        permissions = (
+            ("add_product_to_cart", "Add product to cart"),
+        )
+
     @property
     def total_price(self):
         total_price = Decimal("0")

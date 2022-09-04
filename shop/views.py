@@ -1,6 +1,6 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -105,6 +105,7 @@ class HomepageView(TemplateView):
 
 
 @login_required
+@permission_required("shop.add_product_to_cart")
 def add_to_cart_view(request, item_pk):
     product = get_object_or_404(Product, pk=item_pk)
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -129,7 +130,11 @@ def cart_view(request, pk):
     return TemplateResponse(request, "cart.html", context=context)
 
 
-class DeleteProductReviewView(View):
+class DeleteProductReviewView(UserPassesTestMixin, View):
+
+    def test_func(self):
+        product_review = get_object_or_404(ProductReview, pk=self.kwargs["pk"])
+        return self.request.user == product_review.user
 
     def get(self, request, pk, *args, **kwargs):
         product_review = get_object_or_404(ProductReview, pk=pk)
@@ -137,9 +142,10 @@ class DeleteProductReviewView(View):
         return redirect(request.META.get('HTTP_REFERER', 'homepage'))
 
 
-class ListProductReviewView(LoginRequiredMixin, FormView):
+class ListProductReviewView(PermissionRequiredMixin, LoginRequiredMixin, FormView):
     template_name = "product_reviews.html"
     form_class = ProductReviewForm
+    permission_required = "shop.view_productreview"
 
     def get_initial(self):
         product = self.get_object()
